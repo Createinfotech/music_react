@@ -1,0 +1,59 @@
+name: musichub_flutter
+description: A Flutter music app based on MusicHub - supports Android and Web
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  # UI
+  cupertino_icons: ^1.0.6
+  cached_network_image: ^3.3.1
+  shimmer: ^3.0.0
+  
+  # State Management
+  provider: ^6.1.1
+  
+  # HTTP & API
+  http: ^1.1.0
+  dio: ^5.4.0
+  
+  # Audio Player
+  just_audio: ^0.9.36
+  audio_session: ^0.1.18
+  
+  # Storage
+  shared_preferences: ^2.2.2
+  path_provider: ^2.1.1
+  
+  # UI Utilities
+  flutter_svg: ^2.0.9
+  url_launcher: ^6.2.2
+  share_plus: ^7.2.1
+  
+  # Download
+  flutter_downloader: ^1.11.5
+  permission_handler: ^11.1.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.1
+
+flutter:
+  uses-material-design: true
+  
+  assets:
+    - assets/images/
+    - assets/icons/
+
+  fonts:
+    - family: Roboto
+      fonts:
+        - asset: fonts/Roboto-Regular.ttf
+        - asset: fonts/Roboto-Bold.ttf
+          weight: 700

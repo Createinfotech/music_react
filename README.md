@@ -1,6 +1,8 @@
 # MusicHub
 
-MusicHub is a web music app built using Next.js 14, App Router, and an unofficial music API. The user interface is styled with Tailwind CSS.
+MusicHub is a music streaming application available in two versions:
+- **React/Next.js Version**: Web music app built using Next.js 14, App Router, and Tailwind CSS
+- **Flutter Version**: Cross-platform app with Android and Web support (see `flutter_app/` directory)
 
 [![Follow me](https://img.shields.io/github/followers/r2hu1?style=social)](https://github.com/r2hu1)
 [![Star this Repo](https://img.shields.io/github/stars/r2hu1/musichub?style=social)](https://github.com/r2hu1/musichub)
@@ -15,6 +17,21 @@ MusicHub is a web music app built using Next.js 14, App Router, and an unofficia
 - Light and Dark mode for user preference.
 - Search for your favorite artists, albums, and tracks.
 - Enjoy a seamless music listening experience.
+
+## Versions
+
+### React/Next.js (Web Only)
+
+The original web version built with Next.js 14 and React. See installation instructions below.
+
+### Flutter (Android & Web)
+
+A complete recreation in Flutter with support for:
+- ✅ Android mobile app
+- ✅ Web application
+- 🔄 iOS (requires additional setup)
+
+**[View Flutter Version →](flutter_app/README.md)**
 
 ## Screenshots
 
@@ -40,7 +57,7 @@ Mobile Player
 
 ![Music Page](/public/player-2.png)
 
-## Installation
+## Installation (React/Next.js Version)
 
 1. Clone the repository:
 
