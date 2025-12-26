@@ -48,14 +48,11 @@ flutter pub get
 
 ### 3. Configure API
 
-The app uses the JioSaavn API. The default API URL is configured in `lib/services/api_service.dart`. You can change it by modifying the `_defaultApiUrl` constant.
+The app uses the JioSaavn API with automatic fallback to multiple endpoints. The app is pre-configured with several public API endpoints and includes retry logic for better reliability.
 
-For production use, consider setting up environment variables:
+**If you experience API connection errors**, see [API_CONFIGURATION.md](./API_CONFIGURATION.md) for detailed setup instructions.
 
-```dart
-// In lib/services/api_service.dart
-static const String _defaultApiUrl = 'YOUR_API_URL_HERE';
-```
+To use your own API endpoint, edit `lib/services/api_service.dart` and update the `_apiUrls` list with your deployment URL from [JioSaavn API](https://github.com/sumitkolhe/jiosaavn-api).
 
 ## Running the App
 
@@ -177,6 +174,15 @@ The app integrates with the JioSaavn API (unofficial). Available endpoints:
 - Get song suggestions: `/songs/{id}/suggestions`
 
 ## Troubleshooting
+
+### API Connection Errors
+
+If you see errors like `ClientException: Failed to fetch`:
+
+1. The app automatically tries multiple API endpoints
+2. Check [API_CONFIGURATION.md](./API_CONFIGURATION.md) for detailed troubleshooting
+3. Verify at least one API endpoint is accessible
+4. Consider deploying your own API instance
 
 ### Android Build Issues
 
