@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 import 'package:http/http.dart' as http;
 import '../models/music_models.dart';
 
@@ -10,63 +11,60 @@ class ApiService {
     'https://jiosaavn.vercel.app/api/',
   ];
   
-  static int _currentApiIndex = 0;
-  
-  // Get current API URL
-  static String get apiUrl {
-    return _apiUrls[_currentApiIndex];
-  }
-  
-  // Try next API URL
-  static void _switchToNextApi() {
-    _currentApiIndex = (_currentApiIndex + 1) % _apiUrls.length;
-    print('Switching to API: ${_apiUrls[_currentApiIndex]}');
-  }
-  
   // Make HTTP request with retry logic and fallback
   static Future<http.Response?> _makeRequest(String endpoint, {int maxRetries = 3}) async {
-    int attempts = 0;
-    int apiAttempts = 0;
-    
-    while (attempts < maxRetries && apiAttempts < _apiUrls.length) {
-      try {
-        final uri = Uri.parse('$apiUrl$endpoint');
-        print('Attempting request to: $uri');
-        
-        final response = await http.get(
-          uri,
-          headers: {
-            'Accept': 'application/json',
-          },
-        ).timeout(
-          const Duration(seconds: 10),
-          onTimeout: () {
-            throw Exception('Request timeout');
-          },
-        );
-        
-        if (response.statusCode == 200) {
-          print('Request successful');
-          return response;
-        } else {
-          print('Request failed with status: ${response.statusCode}');
+    // Try each API endpoint
+    for (int apiIndex = 0; apiIndex < _apiUrls.length; apiIndex++) {
+      final apiUrl = _apiUrls[apiIndex];
+      
+      // Retry the current endpoint multiple times
+      for (int attempt = 0; attempt < maxRetries; attempt++) {
+        try {
+          final uri = Uri.parse('$apiUrl$endpoint');
+          print('Attempting request to: $uri (attempt ${attempt + 1}/$maxRetries)');
+          
+          final response = await http.get(
+            uri,
+            headers: {
+              'Accept': 'application/json',
+            },
+          ).timeout(
+            const Duration(seconds: 10),
+            onTimeout: () {
+              throw Exception('Request timeout');
+            },
+          );
+          
+          if (response.statusCode == 200) {
+            print('Request successful');
+            return response;
+          } else {
+            print('Request failed with status: ${response.statusCode}');
+            // Non-200 status codes should also be retried
+            if (attempt < maxRetries - 1) {
+              // Exponential backoff: 1s, 2s, 4s
+              final delayMs = pow(2, attempt) * 1000;
+              await Future.delayed(Duration(milliseconds: delayMs.toInt()));
+            }
+          }
+        } catch (e) {
+          print('Request error: $e');
+          
+          if (attempt < maxRetries - 1) {
+            // Exponential backoff: 1s, 2s, 4s
+            final delayMs = pow(2, attempt) * 1000;
+            await Future.delayed(Duration(milliseconds: delayMs.toInt()));
+          }
         }
-      } catch (e) {
-        print('Request error: $e');
-        attempts++;
-        
-        if (attempts >= maxRetries) {
-          // Try next API endpoint
-          _switchToNextApi();
-          apiAttempts++;
-          attempts = 0; // Reset attempts for new API
-        } else {
-          // Wait before retrying with same API
-          await Future.delayed(Duration(seconds: attempts));
-        }
+      }
+      
+      // If we exhausted retries for this API, try the next one
+      if (apiIndex < _apiUrls.length - 1) {
+        print('Switching to next API endpoint: ${_apiUrls[apiIndex + 1]}');
       }
     }
     
+    print('All API endpoints failed after $maxRetries retries each');
     return null;
   }
 
