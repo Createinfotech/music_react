@@ -11,6 +11,17 @@ class ApiService {
     'https://jiosaavn.vercel.app/api/',
   ];
   
+  // Calculate exponential backoff delay
+  static Duration _getBackoffDelay(int attempt) {
+    final delayMs = pow(2, attempt) * 1000;
+    return Duration(milliseconds: delayMs.toInt());
+  }
+  
+  // Check if response is valid and successful
+  static bool _isValidResponse(http.Response? response) {
+    return response != null && response.statusCode == 200;
+  }
+  
   // Make HTTP request with retry logic and fallback
   static Future<http.Response?> _makeRequest(String endpoint, {int maxRetries = 3}) async {
     // Try each API endpoint
@@ -42,18 +53,14 @@ class ApiService {
             print('Request failed with status: ${response.statusCode}');
             // Non-200 status codes should also be retried
             if (attempt < maxRetries - 1) {
-              // Exponential backoff: 1s, 2s, 4s
-              final delayMs = pow(2, attempt) * 1000;
-              await Future.delayed(Duration(milliseconds: delayMs.toInt()));
+              await Future.delayed(_getBackoffDelay(attempt));
             }
           }
         } catch (e) {
           print('Request error: $e');
           
           if (attempt < maxRetries - 1) {
-            // Exponential backoff: 1s, 2s, 4s
-            final delayMs = pow(2, attempt) * 1000;
-            await Future.delayed(Duration(milliseconds: delayMs.toInt()));
+            await Future.delayed(_getBackoffDelay(attempt));
           }
         }
       }
@@ -73,8 +80,8 @@ class ApiService {
     try {
       final response = await _makeRequest('search/songs?query=$query');
 
-      if (response != null && response.statusCode == 200) {
-        final data = json.decode(response.body);
+      if (_isValidResponse(response)) {
+        final data = json.decode(response!.body);
         final results = data['data']['results'] as List<dynamic>;
         return results.map((e) => Song.fromJson(e)).toList();
       } else {
@@ -92,8 +99,8 @@ class ApiService {
     try {
       final response = await _makeRequest('songs/$id');
 
-      if (response != null && response.statusCode == 200) {
-        final data = json.decode(response.body);
+      if (_isValidResponse(response)) {
+        final data = json.decode(response!.body);
         final songData = data['data'][0];
         return Song.fromJson(songData);
       } else {
@@ -111,8 +118,8 @@ class ApiService {
     try {
       final response = await _makeRequest('songs/$id/suggestions');
 
-      if (response != null && response.statusCode == 200) {
-        final data = json.decode(response.body);
+      if (_isValidResponse(response)) {
+        final data = json.decode(response!.body);
         final results = data['data'] as List<dynamic>;
         return results.map((e) => Song.fromJson(e)).toList();
       } else {
@@ -130,8 +137,8 @@ class ApiService {
     try {
       final response = await _makeRequest('search/albums?query=$query');
 
-      if (response != null && response.statusCode == 200) {
-        final data = json.decode(response.body);
+      if (_isValidResponse(response)) {
+        final data = json.decode(response!.body);
         final results = data['data']['results'] as List<dynamic>;
         return results.map((e) => Album.fromJson(e)).toList();
       } else {
@@ -149,8 +156,8 @@ class ApiService {
     try {
       final response = await _makeRequest('albums?id=$id');
 
-      if (response != null && response.statusCode == 200) {
-        final data = json.decode(response.body);
+      if (_isValidResponse(response)) {
+        final data = json.decode(response!.body);
         return Album.fromJson(data['data']);
       } else {
         print('Failed to load album - no valid response');
