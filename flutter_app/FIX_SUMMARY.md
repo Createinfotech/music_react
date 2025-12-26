@@ -28,7 +28,7 @@ The app automatically switches to the next endpoint if the current one fails.
 ### 2. Retry Logic
 Implemented a `_makeRequest()` method with:
 - Up to 3 retry attempts per endpoint
-- Exponential backoff between retries (1s, 2s, 3s)
+- Exponential backoff between retries (1s, 2s, 4s)
 - Automatic switching to next API after max retries
 - 10-second timeout per request
 
